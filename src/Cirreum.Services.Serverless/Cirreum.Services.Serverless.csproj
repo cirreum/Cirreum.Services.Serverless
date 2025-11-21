@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Cirreum</RootNamespace>
+		<Description>Cirreum infrastructure services for serverless applications</Description>
+		<PackageTags>cirreum;infrastructure;services;serverless</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.51.0" />
+		<PackageReference Include="Cirreum.Core" Version="1.0.15" />
+	</ItemGroup>
+	
+	<ItemGroup>
+
+		<Using Include="Microsoft.Azure.Functions.Worker" />
+		<Using Include="Microsoft.Extensions.Logging" />
+
+		<Using Include="Cirreum" />	
+		<Using Include="Cirreum.Exceptions" />
+		<Using Include="Cirreum.FileSystem" />
+
+	</ItemGroup>
+
+	
+</Project>
