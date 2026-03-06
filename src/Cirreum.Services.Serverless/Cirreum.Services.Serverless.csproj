@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<RootNamespace>Cirreum</RootNamespace>
@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.51.0" />
-		<PackageReference Include="Cirreum.Core" Version="1.0.41" />
+		<PackageReference Include="Cirreum.Core" Version="1.0.42" />
 	</ItemGroup>
 	
 	<ItemGroup>
