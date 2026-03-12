@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 internal sealed class ServerlessUser : UserStateBase {
 
-	public override bool IsReady { get; } = true;
+	public override bool IsAuthenticationComplete { get; } = true;
 
 	internal void SetAuthenticatedPrincipal(ClaimsPrincipal principal) {
 		ArgumentNullException.ThrowIfNull(principal);
