@@ -10,7 +10,7 @@
 		<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
 		<PackageReference Include="Cirreum.Domain" Version="1.1.1" />
 		<PackageReference Include="Cirreum.Messaging" Version="1.0.108" />
-		<PackageReference Include="Cirreum.Messaging.Distributed" Version="1.0.0" />
+		<PackageReference Include="Cirreum.Messaging.Distributed" Version="1.1.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
