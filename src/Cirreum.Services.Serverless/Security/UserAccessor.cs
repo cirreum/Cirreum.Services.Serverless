@@ -11,7 +11,7 @@ sealed class UserAccessor(IFunctionContextAccessor functionContextAccessor) : IU
 	private readonly IFunctionContextAccessor _functionContextAccessor =
 		functionContextAccessor ?? throw new ArgumentNullException(nameof(functionContextAccessor));
 
-	public ValueTask<IUserState> GetUser() {
+	public ValueTask<IUserState> GetUserState() {
 
 		var context = this._functionContextAccessor.Context;
 		if (context == null) {
