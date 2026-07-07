@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Removed the internal `EmptyTransportPublisher` / `IDistributedTransportPublisher<>` registration from `AddCoreServices`. That transport-publisher seam was dissolved in `Cirreum.Messaging.Distributed 1.2.0` — the no-op type no longer exists, so the registration was a compile error once this package re-pinned to 1.2.0. No effect on serverless hosts: the registration resolved to a no-op that nothing consumed (outbound distribution now runs through the Conductor bridge).
+
+### Updated
+
+- Updated NuGet packages.
+
 ## [1.0.46] - 2026-07-04
 
 ### Updated

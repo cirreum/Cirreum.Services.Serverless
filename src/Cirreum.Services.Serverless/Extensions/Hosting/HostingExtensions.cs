@@ -2,7 +2,6 @@
 
 using Cirreum;
 using Cirreum.Clock;
-using Cirreum.Messaging;
 using Cirreum.Security;
 using Cirreum.Security.Middleware;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -32,12 +31,6 @@ public static class HostingExtensions {
 			.AddTransient<ICsvFileBuilder, CsvFileBuilder>()
 			.AddTransient<ICsvFileReader, CsvFileReader>()
 			.AddSingleton<IFileSystem, NotImplementedFileSystem>();
-
-		// The distributed transport publisher is generic per message base type since the reset; register the
-		// shipped no-op as an open generic so a serverless host without distributed messaging resolves it for
-		// any TBase (TryAdd, so a real transport still wins when one is registered).
-		builder.Services
-			.TryAddSingleton(typeof(IDistributedTransportPublisher<>), typeof(EmptyTransportPublisher<>));
 
 		builder.Services
 			.TryAddSingleton(TimeProvider.System);
