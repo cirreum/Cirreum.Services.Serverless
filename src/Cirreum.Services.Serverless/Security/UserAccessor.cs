@@ -1,14 +1,10 @@
-﻿namespace Cirreum.Security;
+namespace Cirreum.Security;
 
 using Microsoft.Extensions.DependencyInjection;
 
 sealed class UserAccessor(IFunctionContextAccessor functionContextAccessor) : IUserStateAccessor {
 
 	private const string UserContextKey = "__User_Context_Key";
-	private static readonly IUserState AnonymousUserInstance = new ServerlessUser();
-
-	private static readonly ValueTask<IUserState> AnonymousUserValueTaskInstance =
-		new ValueTask<IUserState>(AnonymousUserInstance);
 
 	private readonly IFunctionContextAccessor _functionContextAccessor =
 		functionContextAccessor ?? throw new ArgumentNullException(nameof(functionContextAccessor));
@@ -17,27 +13,23 @@ sealed class UserAccessor(IFunctionContextAccessor functionContextAccessor) : IU
 
 		var context = this._functionContextAccessor.Context;
 		if (context == null) {
-			return AnonymousUserValueTaskInstance;
+			// No invocation context (startup, background work) — a fresh anonymous
+			// state. User states are mutable, so they are never shared across
+			// invocations; each caller gets its own instance.
+			return new ValueTask<IUserState>(new ServerlessUser());
 		}
 
-		// Check if we already have a UserState for this request
+		// Check if we already have a UserState for this invocation
 		if (context.Items.TryGetValue(UserContextKey, out var existingState)
-			&& existingState is ServerlessUser user) {
-			return new ValueTask<IUserState>(user);
+			&& existingState is ServerlessUser cached) {
+			return new ValueTask<IUserState>(cached);
 		}
 
+		var user = new ServerlessUser();
 		var principal = this._functionContextAccessor.User;
-		if (principal is null) {
-			return AnonymousUserValueTaskInstance;
+		if (principal?.Identity?.IsAuthenticated == true) {
+			user.SetAuthenticatedPrincipal(principal);
 		}
-
-		if (!principal.Identity?.IsAuthenticated ?? true) {
-			context.Items[UserContextKey] = AnonymousUserInstance;
-			return AnonymousUserValueTaskInstance;
-		}
-
-		user = new ServerlessUser();
-		user.SetAuthenticatedPrincipal(principal);
 
 		// Stamp the caller's AuthenticationBoundary. The scheme is null — a Functions
 		// binding context carries no ASP.NET authentication scheme — and a missing

@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   still leaves the unresolved default rather than failing the invocation.
 - Removed the dead `ServerlessUser.SetAnonymous` method (no callers) and the stale
   exception-message reference to it.
+- **Anonymous user states are no longer a shared process-wide singleton.** The
+  accessor cached one static mutable `ServerlessUser` and handed it to every
+  anonymous invocation — a latent cross-invocation contamination hazard (any future
+  mutation of the shared instance would leak everywhere). Each invocation now gets
+  its own instance, cached per function context like the authenticated path, and the
+  anonymous path also receives a resolved boundary stamp
+  (`IsAuthenticationBoundaryResolved` is `true` with `None`) when a resolver is
+  registered.
 - First test suite (`tests/Cirreum.Services.Serverless.Tests.slnx`): anonymous
   fallbacks, per-invocation caching, and boundary stamping with and without a
   registered resolver.

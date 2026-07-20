@@ -42,6 +42,34 @@ public class UserAccessorTests {
 	}
 
 	[Fact]
+	public async Task GetUserState_UnauthenticatedWithResolver_StampsResolvedNone() {
+		var provider = new ServiceCollection()
+			.AddSingleton<IAuthenticationBoundaryResolver, DefaultAuthenticationBoundaryResolver>()
+			.BuildServiceProvider();
+		var context = CreateFunctionContext(provider);
+		var accessor = new UserAccessor(CreateContextAccessor(context, new ClaimsPrincipal(new ClaimsIdentity())));
+
+		var state = await accessor.GetUserState();
+
+		state.AuthenticationBoundary.Should().Be(AuthenticationBoundary.None);
+		state.IsAuthenticationBoundaryResolved.Should().BeTrue();
+	}
+
+	[Fact]
+	public async Task GetUserState_AnonymousStates_AreNeverSharedAcrossInvocations() {
+		// User states are mutable — a shared anonymous singleton would let one
+		// invocation's mutations leak into every other. Each context gets its own.
+		var provider = new ServiceCollection().BuildServiceProvider();
+		var first = new UserAccessor(CreateContextAccessor(CreateFunctionContext(provider), principal: null));
+		var second = new UserAccessor(CreateContextAccessor(CreateFunctionContext(provider), principal: null));
+
+		var stateOne = await first.GetUserState();
+		var stateTwo = await second.GetUserState();
+
+		stateTwo.Should().NotBeSameAs(stateOne);
+	}
+
+	[Fact]
 	public async Task GetUserState_AuthenticatedWithResolver_StampsBoundary() {
 		var provider = new ServiceCollection()
 			.AddSingleton<IAuthenticationBoundaryResolver, DefaultAuthenticationBoundaryResolver>()
