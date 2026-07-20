@@ -32,6 +32,12 @@ public static class HostingExtensions {
 			.AddTransient<ICsvFileReader, CsvFileReader>()
 			.AddSingleton<IFileSystem, NotImplementedFileSystem>();
 
+		// The accessor stamps the caller's AuthenticationBoundary during user-state
+		// assembly, so the package that consumes the resolver guarantees one exists.
+		// TryAdd — an app-registered custom resolver wins when registered first.
+		builder.Services
+			.TryAddSingleton<IAuthenticationBoundaryResolver, DefaultAuthenticationBoundaryResolver>();
+
 		builder.Services
 			.TryAddSingleton(TimeProvider.System);
 		builder.Services

@@ -1,5 +1,7 @@
 ﻿namespace Cirreum.Security;
 
+using Microsoft.Extensions.DependencyInjection;
+
 sealed class UserAccessor(IFunctionContextAccessor functionContextAccessor) : IUserStateAccessor {
 
 	private const string UserContextKey = "__User_Context_Key";
@@ -36,6 +38,15 @@ sealed class UserAccessor(IFunctionContextAccessor functionContextAccessor) : IU
 
 		user = new ServerlessUser();
 		user.SetAuthenticatedPrincipal(principal);
+
+		// Stamp the caller's AuthenticationBoundary. The scheme is null — a Functions
+		// binding context carries no ASP.NET authentication scheme — and a missing
+		// resolver leaves the unresolved default (None) rather than failing the call.
+		var resolver = context.InstanceServices?.GetService<IAuthenticationBoundaryResolver>();
+		if (resolver is not null) {
+			user.SetResolvedAuthenticationBoundary(resolver.Resolve(user, authenticationScheme: null));
+		}
+
 		context.Items[UserContextKey] = user;
 		return new ValueTask<IUserState>(user);
 

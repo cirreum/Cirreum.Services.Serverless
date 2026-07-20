@@ -17,7 +17,7 @@ internal sealed class ServerlessUser : UserStateBase {
 
 		this._isAuthenticated = this._identity.IsAuthenticated;
 		if (!this._isAuthenticated) {
-			throw new InvalidOperationException("Cannot initialize from an unauthenticated user. Use SetAnonymous method.");
+			throw new InvalidOperationException("Cannot initialize from an unauthenticated user.");
 		}
 
 		this._profile = new UserProfile(this._principal, TimeZoneInfo.Local.Id);
@@ -26,12 +26,8 @@ internal sealed class ServerlessUser : UserStateBase {
 		}
 	}
 
-	internal void SetAnonymous() {
-		this._isAuthenticated = false;
-		this._principal = AnonymousUser.Shared;
-		this._identity = AnonymousUser.Shared.Identity;
-		this._profile = UserProfile.Anonymous;
-		this.EndSession();
+	internal void SetResolvedAuthenticationBoundary(AuthenticationBoundary boundary) {
+		this.SetAuthenticationBoundary(boundary);
 	}
 
 }

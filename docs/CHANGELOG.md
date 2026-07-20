@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`UserAccessor` now stamps the caller's `AuthenticationBoundary` during user-state
+  assembly.** The serverless host never resolved an `IAuthenticationBoundaryResolver`,
+  so every authenticated Functions caller carried the unresolved default
+  (`AuthenticationBoundary.None`) and grant providers gating on `Global`/`Tenant`
+  could never pass — the same seam restored for the server host under ADR-0032.
+  `AddCoreServices()` now `TryAdd`-registers the Kernel default resolver
+  (authenticated → `Global`; an app-registered resolver wins), and the accessor
+  resolves it from the invocation's services with a `null` scheme (a Functions
+  binding context carries no ASP.NET authentication scheme). A missing resolver
+  still leaves the unresolved default rather than failing the invocation.
+- Removed the dead `ServerlessUser.SetAnonymous` method (no callers) and the stale
+  exception-message reference to it.
+- First test suite (`tests/Cirreum.Services.Serverless.Tests.slnx`): anonymous
+  fallbacks, per-invocation caching, and boundary stamping with and without a
+  registered resolver.
+
+### Updated
+
+- Updated NuGet packages.
+
 ## [1.0.50] - 2026-07-19
 
 ### Updated
